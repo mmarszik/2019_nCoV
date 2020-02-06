@@ -100,7 +100,6 @@ int main(int argc, char *argv[]) {
         std::istringstream ss(argv[1]);
         ss >> loops;
     }
-    seed = 123;
     std::cout << "mainSeed: " << seed << std::endl;
     TRnd rnd( seed );
     ftyp e;
