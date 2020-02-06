@@ -1,8 +1,10 @@
 #include <iostream>
 #include <random>
-#include <algorithm>
+#include <sstream>
 
-using TRnd = std::ranlux48;
+#include <MRndCPP/rnd.h>
+
+//using TRnd = std::ranlux48;
 using ftyp = double;
 using cftyp = const ftyp;
 using utyp = unsigned int;
@@ -40,9 +42,7 @@ void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
 }
 
 void chaos( TRnd &rnd, ftyp params[SIZE_PRMS] , cftyp s ) {
-    std::uniform_int_distribution<utyp> d2(0,SIZE_PRMS-1);
-    std::uniform_real_distribution<ftyp> d1(-1,+1);
-    params[ d2(rnd) ] += d1(rnd) * s;
+    params[ rnd() % SIZE_PRMS ] += rnd.getFloat(-s,+s);
 }
 
 
@@ -53,17 +53,13 @@ ftyp compute(
     static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554};
     Solve solve;
     solve = best;
-    ftyp bigPenal = 0.000001;
+    ftyp bigPenal = 1E-3;
     ftyp e = eval( best.params , data , bigPenal );
     ftyp s = 1;
-    ftyp avg = 1;
-    for( ultyp loop=0 ; avg > 0.00000001 ; loop++ ) {
+    ftyp lastE = e;
+    for( ultyp loop=1 ; s > 0.00001 ; loop++ ) {
         chaos( rnd , solve.params , s );
         cftyp tmp = eval( solve.params , data , bigPenal );
-        if( e < 1000 ) {
-            cftyp d = tmp >= e ? 0 : e - tmp;
-            avg = avg * 0.999999 + d * 0.000001;
-        }
         if( tmp <= e ) {
             if( tmp < e ) {
                 e = tmp;
@@ -71,13 +67,21 @@ ftyp compute(
             best = solve;
         } else if( rnd() % 2 == 0 ) {
             solve = best;
-            s *= 0.9999995;
         }
-        if( bigPenal > 0.000000000001 ) {
-            bigPenal *= 0.9999995;
+//        s *= 0.99999995;
+        if( ! (loop & 0x5FF) ) {
+            cftyp tmp = lastE - e;
+            if( tmp < 0.001 ) {
+                s *= 0.999;
+            }
+            lastE = e;
         }
+        if( bigPenal > 1E-9 ) {
+            bigPenal *= 0.999995;
+        }
+
         if( ! (loop & 0xFFFFF) ) {
-            std::cout << loop << " " << e << " [" << s << "] "<< " [" << bigPenal << "] [" << avg << "] ";
+            std::cout << loop << " " << e << " [" << s << "] "<< " [" << bigPenal << "] ";
             for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
                 std::cout << best.params[i] << " ";
             }
@@ -91,11 +95,18 @@ ftyp compute(
 int main(int argc, char *argv[]) {
     std::random_device rd;
     ultyp seed = rd();
+    ultyp loops = 0xFFFFFFFFFFFFFFFFull;
+    if( argc > 1 ) {
+        std::istringstream ss(argv[1]);
+        ss >> loops;
+    }
+    seed = 123;
     std::cout << "mainSeed: " << seed << std::endl;
     TRnd rnd( seed );
     ftyp e;
     Solve best;
-    for( utyp loop=0 ; true ; loop++ ) {
+    time_t start = time(NULL);
+    for( utyp loop=0 ; loop < loops ; loop++ ) {
         Solve s;
         initParams( rnd , s.params );
         cftyp tmp = compute( rnd, s );
@@ -104,7 +115,7 @@ int main(int argc, char *argv[]) {
             e = tmp;
         }
         std::cout << "----------------------------------" << std::endl;
-        std::cout << loop << " [" << e << "] ";
+        std::cout << loop << " " << (time(NULL)-start) << "s  [" << e << "] ";
         for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
             std::cout << best.params[i] << " ";
         }
