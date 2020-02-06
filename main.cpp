@@ -77,8 +77,8 @@ ftyp compute(
 //        s *= 0.99999995;
         if( ! (loop & 0xFFF) ) {
             cftyp tmp = lastE - e;
-            if( tmp < 0.1 ) {
-                s *= 0.9999;
+            if( tmp < 0.001 ) {
+                s *= 0.995;
             }
             lastE = e;
         }
