@@ -11,7 +11,7 @@ using utyp = unsigned int;
 using ultyp = unsigned long long;
 
 constexpr utyp SIZE_PRMS =  7;
-constexpr utyp SIZE_DATA = 16;
+constexpr utyp SIZE_DATA = 17;
 
 struct Solve {
     ftyp params[SIZE_PRMS];
@@ -51,11 +51,18 @@ void chaos( TRnd &rnd, ftyp params[SIZE_PRMS] , cftyp s ) {
     params[ rnd() % SIZE_PRMS ] += rnd.getFloat(-s,+s);
 }
 
-static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554};
+static ftyp sign(cftyp x) {
+    if( x < 0 ) {
+        return -1;
+    }
+    return +1;
+}
 
-ftyp compute(
+
+static ftyp compute(
     Solve &best
 ) {
+    static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276};
     ftyp bigPenal = 1E-8;
     ftyp e = eval( best.params , data , bigPenal );
     ftyp steps[SIZE_PRMS];
@@ -66,10 +73,10 @@ ftyp compute(
     }
     norm = sqrt( norm / SIZE_PRMS );
 
-    for( ultyp loop=1 ; norm > 1E-7 ; loop++ ) {
+    for( ultyp loop=1 ; norm > 1E-6 ; loop++ ) {
         for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
-            if( fabs(steps[i]) < 1E-8 ) { steps[i] = 1E-8; }
-            if( fabs(steps[i]) > 1E+1 ) { steps[i] = 1E+1; }
+            if( fabs(steps[i]) < 1E-9 ) { steps[i] = 1E-9 * sign( steps[i] ); }
+            if( fabs(steps[i]) > 1E+1 ) { steps[i] = 1E+1 * sign( steps[i] ); }
             best.params[i] += steps[i];
             cftyp tmp = eval( best.params , data , bigPenal );
             if( tmp >= e ) {
@@ -106,47 +113,6 @@ ftyp compute(
     return e;
 }
 
-ftyp compute(
-    TRnd &rnd,
-    Solve &best
-) {
-    Solve solve;
-    solve = best;
-    ftyp bigPenal = 1E-9;
-    ftyp e = eval( best.params , data , bigPenal );
-    ftyp s = 1;
-    ftyp lastE = e;
-    for( ultyp loop=1 ; s > 0.000001 ; loop++ ) {
-        chaos( rnd , solve.params , s );
-        cftyp tmp = eval( solve.params , data , bigPenal );
-        if( tmp <= e ) {
-            if( tmp < e ) {
-                e = tmp;
-            }
-            best = solve;
-        } else if( rnd() % 3 == 0 ) {
-            solve = best;
-        }
-//        s *= 0.99999995;
-        if( ! (loop & 0xFF) ) {
-            cftyp tmp = lastE - e;
-            if( tmp < 0.001 ) {
-                s *= 0.995;
-            }
-            lastE = e;
-        }
-        if( ! (loop & 0xFFF) ) {
-            std::cout << loop << " " << e << " [" << s << "] "<< " [" << bigPenal << "] ";
-            for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
-                std::cout << best.params[i] << " ";
-            }
-            std::cout << std::endl;
-        }
-    }
-
-    return e;
-}
-
 int main(int argc, char *argv[]) {
     std::random_device rd;
     ultyp seed = rd();
@@ -158,14 +124,20 @@ int main(int argc, char *argv[]) {
     std::cout << "mainSeed: " << seed << std::endl;
     TRnd rnd( seed );
     ftyp e;
-    Solve best;
+    Solve best,solve;
+    solve.params[0] = -18056.5;
+    solve.params[1] = 0.191257;
+    solve.params[2] = 10973.3;
+    solve.params[3] = 0.24337;
+    solve.params[4] = 0.00285059;
+    solve.params[5] = 1.53513;
+    solve.params[6] = 10186.3;
+
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
-        Solve s;
-        initParams( rnd , s.params );
-        cftyp tmp = compute( s );
+        cftyp tmp = compute( solve );
         if( loop == 0 || tmp < e ) {
-            best = s;
+            best = solve;
             e = tmp;
         }
         std::cout << "----------------------------------" << std::endl;
@@ -175,6 +147,7 @@ int main(int argc, char *argv[]) {
         }
         std::cout << std::endl;
         std::cout << "----------------------------------" << std::endl;
+        initParams( rnd , solve.params );
     }
     return 0;
 }
