@@ -24,8 +24,8 @@ ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
 ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
     ftyp e = 0;
     for( utyp i=1 ; i<SIZE_DATA ; i++ ) {
-        cftyp tmp = data[i] - formula( data[i-1] , params );
-        e += tmp * tmp;
+        cftyp tmp = fabs( data[i] - formula( data[i-1] , params ) ) / data[i];
+        e += tmp;
     }
     e = sqrt( e / (SIZE_DATA-1) );
     for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
@@ -36,7 +36,7 @@ ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
 
 void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
     std::uniform_real_distribution<ftyp> d1(-200,+200);
-    std::uniform_real_distribution<ftyp> d2(-2,+2);
+    std::uniform_real_distribution<ftyp> d2(-20,+20);
     std::uniform_real_distribution<ftyp> d3(-10000,+10000);
     params[0] = d1(rnd);
     params[1] = d2(rnd);
@@ -59,7 +59,7 @@ ftyp compute(
     static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554};
     Solve solve;
     solve = best;
-    ftyp bigPenal = 1E-12;
+    ftyp bigPenal = 1E-9;
     ftyp e = eval( best.params , data , bigPenal );
     ftyp s = 1;
     ftyp lastE = e;
@@ -71,21 +71,17 @@ ftyp compute(
                 e = tmp;
             }
             best = solve;
-        } else if( rnd() % 2 == 0 ) {
+        } else if( rnd() % 3 == 0 ) {
             solve = best;
         }
 //        s *= 0.99999995;
-        if( ! (loop & 0xFFFF) ) {
+        if( ! (loop & 0x7FFF) ) {
             cftyp tmp = lastE - e;
-            if( tmp < 0.1 ) {
-                s *= 0.99;
+            if( tmp < 0.0001 ) {
+                s *= 0.999;
             }
             lastE = e;
         }
-        if( bigPenal > 1E-18 ) {
-            bigPenal *= 0.99999999;
-        }
-
         if( ! (loop & 0xFFFFF) ) {
             std::cout << loop << " " << e << " [" << s << "] "<< " [" << bigPenal << "] ";
             for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
