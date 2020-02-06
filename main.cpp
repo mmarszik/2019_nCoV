@@ -51,12 +51,65 @@ void chaos( TRnd &rnd, ftyp params[SIZE_PRMS] , cftyp s ) {
     params[ rnd() % SIZE_PRMS ] += rnd.getFloat(-s,+s);
 }
 
+static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554};
+
+ftyp compute(
+    Solve &best
+) {
+    ftyp bigPenal = 1E-8;
+    ftyp e = eval( best.params , data , bigPenal );
+    ftyp steps[SIZE_PRMS];
+    ftyp norm=0;
+    for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
+        steps[i] = 0.1;
+        norm += steps[i]*steps[i];
+    }
+    norm = sqrt( norm / SIZE_PRMS );
+
+    for( ultyp loop=1 ; norm > 1E-7 ; loop++ ) {
+        for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
+            if( fabs(steps[i]) < 1E-8 ) { steps[i] = 1E-8; }
+            if( fabs(steps[i]) > 1E+1 ) { steps[i] = 1E+1; }
+            best.params[i] += steps[i];
+            cftyp tmp = eval( best.params , data , bigPenal );
+            if( tmp >= e ) {
+                best.params[i] -= steps[i] * 2;
+                cftyp tmp = eval( best.params , data , bigPenal );
+                if( tmp >= e ) {
+                    best.params[i] += steps[i];
+                    steps[i] *= 0.6;
+                } else {
+                    steps[i] *= -2;
+                    e = tmp;
+                }
+            } else {
+                e = tmp;
+                steps[i] *= 2;
+            }
+        }
+        if( ! (loop & 0xFF) ) {
+            norm=0;
+            for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
+                norm += steps[i]*steps[i];
+            }
+            norm = sqrt( norm );
+        }
+
+        if( ! (loop & 0xFFFF) ) {
+            std::cout << loop << " " << e << " [" << norm << "] " << " [" << bigPenal << "] ";
+            for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
+                std::cout << best.params[i] << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
+    return e;
+}
 
 ftyp compute(
     TRnd &rnd,
     Solve &best
 ) {
-    static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554};
     Solve solve;
     solve = best;
     ftyp bigPenal = 1E-9;
@@ -75,14 +128,14 @@ ftyp compute(
             solve = best;
         }
 //        s *= 0.99999995;
-        if( ! (loop & 0xFFFF) ) {
+        if( ! (loop & 0xFF) ) {
             cftyp tmp = lastE - e;
-            if( tmp < 0.1 ) {
+            if( tmp < 0.001 ) {
                 s *= 0.995;
             }
             lastE = e;
         }
-        if( ! (loop & 0xFFFFF) ) {
+        if( ! (loop & 0xFFF) ) {
             std::cout << loop << " " << e << " [" << s << "] "<< " [" << bigPenal << "] ";
             for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
                 std::cout << best.params[i] << " ";
@@ -110,7 +163,7 @@ int main(int argc, char *argv[]) {
     for( utyp loop=0 ; loop < loops ; loop++ ) {
         Solve s;
         initParams( rnd , s.params );
-        cftyp tmp = compute( rnd, s );
+        cftyp tmp = compute( s );
         if( loop == 0 || tmp < e ) {
             best = s;
             e = tmp;
