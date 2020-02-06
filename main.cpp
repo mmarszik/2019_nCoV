@@ -71,14 +71,14 @@ ftyp compute(
                 e = tmp;
             }
             best = solve;
-        } else if( rnd() % 3 == 0 ) {
+        } else if( rnd() % 2 == 0 ) {
             solve = best;
         }
 //        s *= 0.99999995;
-        if( ! (loop & 0xFFF) ) {
+        if( ! (loop & 0xFFFF) ) {
             cftyp tmp = lastE - e;
-            if( tmp < 0.001 ) {
-                s *= 0.995;
+            if( tmp < 0.1 ) {
+                s *= 0.99;
             }
             lastE = e;
         }
