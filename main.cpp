@@ -35,10 +35,16 @@ ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
 }
 
 void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
-    std::uniform_real_distribution<ftyp> d(-20,+20);
-    for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
-        params[i] = d(rnd);
-    }
+    std::uniform_real_distribution<ftyp> d1(-200,+200);
+    std::uniform_real_distribution<ftyp> d2(-2,+2);
+    std::uniform_real_distribution<ftyp> d3(-10000,+10000);
+    params[0] = d1(rnd);
+    params[1] = d2(rnd);
+    params[2] = d1(rnd);
+    params[3] = d2(rnd);
+    params[4] = d1(rnd);
+    params[5] = d2(rnd);
+    params[6] = d3(rnd);
 }
 
 void chaos( TRnd &rnd, ftyp params[SIZE_PRMS] , cftyp s ) {
@@ -76,8 +82,8 @@ ftyp compute(
             }
             lastE = e;
         }
-        if( bigPenal > 1E-9 ) {
-            bigPenal *= 0.999995;
+        if( bigPenal > 1E-12 ) {
+            bigPenal *= 0.999999;
         }
 
         if( ! (loop & 0xFFFFF) ) {
