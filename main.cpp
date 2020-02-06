@@ -25,7 +25,7 @@ ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
     ftyp e = 0;
     for( utyp i=1 ; i<SIZE_DATA ; i++ ) {
         cftyp tmp = fabs( data[i] - formula( data[i-1] , params ) ) / data[i];
-        e += tmp;
+        e += tmp * tmp;
     }
     e = sqrt( e / (SIZE_DATA-1) );
     for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
@@ -63,7 +63,7 @@ ftyp compute(
     ftyp e = eval( best.params , data , bigPenal );
     ftyp s = 1;
     ftyp lastE = e;
-    for( ultyp loop=1 ; s > 0.00001 ; loop++ ) {
+    for( ultyp loop=1 ; s > 0.000001 ; loop++ ) {
         chaos( rnd , solve.params , s );
         cftyp tmp = eval( solve.params , data , bigPenal );
         if( tmp <= e ) {
