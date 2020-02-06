@@ -59,7 +59,7 @@ ftyp compute(
     static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554};
     Solve solve;
     solve = best;
-    ftyp bigPenal = 1E-3;
+    ftyp bigPenal = 1E-12;
     ftyp e = eval( best.params , data , bigPenal );
     ftyp s = 1;
     ftyp lastE = e;
@@ -71,19 +71,19 @@ ftyp compute(
                 e = tmp;
             }
             best = solve;
-        } else if( rnd() % 2 == 0 ) {
+        } else if( rnd() % 3 == 0 ) {
             solve = best;
         }
 //        s *= 0.99999995;
-        if( ! (loop & 0x5FF) ) {
+        if( ! (loop & 0xFFF) ) {
             cftyp tmp = lastE - e;
-            if( tmp < 0.001 ) {
-                s *= 0.999;
+            if( tmp < 0.1 ) {
+                s *= 0.9999;
             }
             lastE = e;
         }
-        if( bigPenal > 1E-12 ) {
-            bigPenal *= 0.999999;
+        if( bigPenal > 1E-18 ) {
+            bigPenal *= 0.99999999;
         }
 
         if( ! (loop & 0xFFFFF) ) {
