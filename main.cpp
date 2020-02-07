@@ -1,6 +1,7 @@
 #include <iostream>
 #include <random>
 #include <sstream>
+#include <cstring>
 
 #include <MRndCPP/rnd.h>
 
@@ -24,10 +25,8 @@ ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
 ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
     ftyp e = 0;
     for( utyp i=1 ; i<SIZE_DATA ; i++ ) {
-        cftyp tmp = data[i] - formula( data[i-1] , params );
-        e += tmp * tmp;
+        e += fabs( data[i] - formula( data[i-1] , params ) ) / data[i];
     }
-    e = sqrt( e / (SIZE_DATA-1) );
     for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
         e += params[i] * params[i] * bigPenal;
     }
@@ -35,9 +34,9 @@ ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
 }
 
 void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
-    std::uniform_real_distribution<ftyp> d1(-200,+200);
+    std::uniform_real_distribution<ftyp> d1(-1000,+1000);
     std::uniform_real_distribution<ftyp> d2(-20,+20);
-    std::uniform_real_distribution<ftyp> d3(-10000,+10000);
+    std::uniform_real_distribution<ftyp> d3(-20000,+20000);
     params[0] = d1(rnd);
     params[1] = d2(rnd);
     params[2] = d1(rnd);
@@ -47,63 +46,43 @@ void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
     params[6] = d3(rnd);
 }
 
-void chaos( TRnd &rnd, ftyp params[SIZE_PRMS] , cftyp s ) {
-    params[ rnd() % SIZE_PRMS ] += rnd.getFloat(-s,+s);
-}
-
-static ftyp sign(cftyp x) {
-    if( x < 0 ) {
-        return -1;
+static void chaos1( TRnd &rnd, ftyp params[SIZE_PRMS], bool total ) {
+    if( total ) {
+        switch( rnd() % 7 ) {
+            case 0: params[0] = rnd.getFloat(-1000,+1000); break;
+            case 1: params[1] = rnd.getFloat(-10,+10); break;
+            case 2: params[2] = rnd.getFloat(-1000,+1000); break;
+            case 3: params[3] = rnd.getFloat(-10,+10); break;
+            case 4: params[4] = rnd.getFloat(-1000,+1000); break;
+            case 5: params[5] = rnd.getFloat(-10,+10); break;
+            case 6: params[6] = rnd.getFloat(-30000,+30000); break;
+        }
+    } else {
+        utyp r = rnd() % SIZE_PRMS;
+        params[r] += rnd.getFloat( -0.01 * params[r] , +0.01 * params[r] );
     }
-    return +1;
 }
-
 
 static ftyp compute(
+    TRnd &rnd,
     Solve &best
 ) {
     static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276};
-    ftyp bigPenal = 1E-8;
+    ftyp bigPenal = 1E-14;
     ftyp e = eval( best.params , data , bigPenal );
-    ftyp steps[SIZE_PRMS];
-    ftyp norm=0;
-    for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
-        steps[i] = 0.1;
-        norm += steps[i]*steps[i];
-    }
-    norm = sqrt( norm / SIZE_PRMS );
+    Solve solve = best;
 
-    for( ultyp loop=1 ; norm > 1E-6 ; loop++ ) {
-        for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
-            if( fabs(steps[i]) < 1E-9 ) { steps[i] = 1E-9 * sign( steps[i] ); }
-            if( fabs(steps[i]) > 1E+1 ) { steps[i] = 1E+1 * sign( steps[i] ); }
-            best.params[i] += steps[i];
-            cftyp tmp = eval( best.params , data , bigPenal );
-            if( tmp >= e ) {
-                best.params[i] -= steps[i] * 2;
-                cftyp tmp = eval( best.params , data , bigPenal );
-                if( tmp >= e ) {
-                    best.params[i] += steps[i];
-                    steps[i] *= 0.6;
-                } else {
-                    steps[i] *= -2;
-                    e = tmp;
-                }
-            } else {
-                e = tmp;
-                steps[i] *= 2;
-            }
+    for( ultyp loop=0 ; loop <= 0xFFFFFu*20 ; loop++ ) {
+        chaos1( rnd , solve.params , loop < 0xFFFFFu*3 );
+        cftyp tmp = eval( solve.params , data , bigPenal );
+        if( tmp <= e ) {
+            best = solve;
+            e = tmp;
+        } else if( rnd() % 5 == 0 ) {
+            solve = best;
         }
-        if( ! (loop & 0xFF) ) {
-            norm=0;
-            for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
-                norm += steps[i]*steps[i];
-            }
-            norm = sqrt( norm );
-        }
-
-        if( ! (loop & 0xFFFF) ) {
-            std::cout << loop << " " << e << " [" << norm << "] " << " [" << bigPenal << "] ";
+        if( ! (loop & 0xFFFFF) ) {
+            std::cout << loop << " [" << e << "] ";
             for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
                 std::cout << best.params[i] << " ";
             }
@@ -112,6 +91,7 @@ static ftyp compute(
     }
     return e;
 }
+
 
 int main(int argc, char *argv[]) {
     std::random_device rd;
@@ -125,17 +105,17 @@ int main(int argc, char *argv[]) {
     TRnd rnd( seed );
     ftyp e;
     Solve best,solve;
-    solve.params[0] = -18056.5;
-    solve.params[1] = 0.191257;
-    solve.params[2] = 10973.3;
-    solve.params[3] = 0.24337;
-    solve.params[4] = 0.00285059;
-    solve.params[5] = 1.53513;
-    solve.params[6] = 10186.3;
+    solve.params[0] = -6530.51;
+    solve.params[1] = -0.402183;
+    solve.params[2] = -1110.89;
+    solve.params[3] = -0.322757;
+    solve.params[4] = 1.65745;
+    solve.params[5] = 0.962681;
+    solve.params[6] = 790.465;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
-        cftyp tmp = compute( solve );
+        cftyp tmp = compute( rnd, solve );
         if( loop == 0 || tmp < e ) {
             best = solve;
             e = tmp;
