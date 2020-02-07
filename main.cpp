@@ -26,7 +26,8 @@ ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
 ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
     ftyp e = 0;
     for( utyp i=1 ; i<SIZE_DATA ; i++ ) {
-        e += fabs( data[i] - formula( data[i-1] , params ) ) / data[i];
+        cftyp tmp = fabs( data[i] - formula( data[i-1] , params ) ) / data[i];
+        e += tmp * tmp;
     }
     for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
         e += params[i] * params[i] * bigPenal;
@@ -69,7 +70,7 @@ static ftyp compute(
     Solve &best
 ) {
     static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481};
-    ftyp bigPenal = 1E-14;
+    ftyp bigPenal = 1E-16;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
     cftyp step_start = 1.0;
@@ -116,13 +117,13 @@ int main(int argc, char *argv[]) {
     TRnd rnd( seed );
     ftyp e;
     Solve best,solve;
-    solve.params[0] = 1.50549;
-    solve.params[1] = 0.971191;
-    solve.params[2] = -1754.73;
-    solve.params[3] = -0.18329;
-    solve.params[4] = -3037.41;
-    solve.params[5] = -0.172883;
-    solve.params[6] = 1722.27;
+    solve.params[0] = 2.33031;
+    solve.params[1] = 0.929944;
+    solve.params[2] = -254874;
+    solve.params[3] = -1.13515;
+    solve.params[4] = 1018.52;
+    solve.params[5] = -0.19585;
+    solve.params[6] = -44.3178;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
