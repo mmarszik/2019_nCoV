@@ -10,6 +10,7 @@ using ftyp = double;
 using cftyp = const ftyp;
 using utyp = unsigned int;
 using ultyp = unsigned long long;
+using cltyp = const ultyp;
 
 constexpr utyp SIZE_PRMS =  7;
 constexpr utyp SIZE_DATA = 17;
@@ -46,8 +47,8 @@ void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
     params[6] = d3(rnd);
 }
 
-static void chaos1( TRnd &rnd, ftyp params[SIZE_PRMS], bool total ) {
-    if( total ) {
+static void chaos( TRnd &rnd, ftyp params[SIZE_PRMS], cftyp step ) {
+    if( step >= 1 ) {
         switch( rnd() % 7 ) {
             case 0: params[0] = rnd.getFloat(-1000,+1000); break;
             case 1: params[1] = rnd.getFloat(-10,+10); break;
@@ -59,7 +60,7 @@ static void chaos1( TRnd &rnd, ftyp params[SIZE_PRMS], bool total ) {
         }
     } else {
         utyp r = rnd() % SIZE_PRMS;
-        params[r] += rnd.getFloat( -0.01 * params[r] , +0.01 * params[r] );
+        params[r] += rnd.getFloat( -step * params[r] , +step * params[r] );
     }
 }
 
@@ -71,18 +72,28 @@ static ftyp compute(
     ftyp bigPenal = 1E-14;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
+    cftyp step_start = 1.0;
+    cftyp step_end   = 0.001;
+    cltyp part       = 0xFFFFFu;
+    cltyp loops      = part*20u;
+    ultyp full_rand  = part*2u;
+    cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
+    ftyp step        = step_start;
 
-    for( ultyp loop=0 ; loop <= 0xFFFFFu*20 ; loop++ ) {
-        chaos1( rnd , solve.params , loop < 0xFFFFFu*3 );
+    for( ultyp loop=0 ; loop <= loops ; loop++ ) {
+        if( loop > full_rand ) {
+            step *= ratio;
+        }
+        chaos( rnd , solve.params , step );
         cftyp tmp = eval( solve.params , data , bigPenal );
         if( tmp <= e ) {
             best = solve;
             e = tmp;
-        } else if( rnd() % 5 == 0 ) {
+        } else if( rnd() % 3 == 0 ) {
             solve = best;
         }
-        if( ! (loop & 0xFFFFF) ) {
-            std::cout << loop << " [" << e << "] ";
+        if( ! (loop & part) || loop == loops ) {
+            std::cout << loop << " [" << e << "] " << " {" << step << "} ";
             for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
                 std::cout << best.params[i] << " ";
             }
@@ -105,13 +116,13 @@ int main(int argc, char *argv[]) {
     TRnd rnd( seed );
     ftyp e;
     Solve best,solve;
-    solve.params[0] = -6530.51;
-    solve.params[1] = -0.402183;
-    solve.params[2] = -1110.89;
-    solve.params[3] = -0.322757;
-    solve.params[4] = 1.65745;
-    solve.params[5] = 0.962681;
-    solve.params[6] = 790.465;
+    solve.params[0] = 1.50549;
+    solve.params[1] = 0.971191;
+    solve.params[2] = -1754.73;
+    solve.params[3] = -0.18329;
+    solve.params[4] = -3037.41;
+    solve.params[5] = -0.172883;
+    solve.params[6] = 1722.27;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
