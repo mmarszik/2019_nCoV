@@ -13,7 +13,7 @@ using ultyp = unsigned long long;
 using cltyp = const ultyp;
 
 constexpr utyp SIZE_PRMS =  7;
-constexpr utyp SIZE_DATA = 18;
+constexpr utyp SIZE_DATA = 19;
 
 struct Solve {
     ftyp params[SIZE_PRMS];
@@ -69,8 +69,8 @@ static ftyp compute(
     TRnd &rnd,
     Solve &best
 ) {
-    static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481};
-    ftyp bigPenal = 1E-26;
+    static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481,34886};
+    ftyp bigPenal = 1E-28;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
     cftyp step_start = 1;
@@ -80,7 +80,8 @@ static ftyp compute(
     ultyp full_rand  = part*4u;
     cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
     ftyp step        = step_start;
-    ftyp last = e;
+    ftyp last        = e;
+    cftyp minInc     = 0.0000001;
 
     for( ultyp loop=0 ; loop <= loops ; loop++ ) {
         if( loop > full_rand ) {
@@ -100,7 +101,7 @@ static ftyp compute(
                 std::cout << best.params[i] << " ";
             }
             std::cout << std::endl;
-            if( last - e < 0.000001 ) {
+            if( last - e < minInc ) {
                 break;
             }
             last = e;
@@ -122,13 +123,13 @@ int main(int argc, char *argv[]) {
     TRnd rnd( seed );
     ftyp e;
     Solve best,solve;
-    solve.params[0] = 8.16855;
-    solve.params[1] = 0.806828;
-    solve.params[2] = -497627000;
-    solve.params[3] = -2.03073;
-    solve.params[4] = 48533900;
-    solve.params[5] = -1.59798;
-    solve.params[6] = -1079.98;
+    solve.params[0] = 11194700000;
+    solve.params[1] = -2.59412;
+    solve.params[2] = 6.26282;
+    solve.params[3] = 0.831672;
+    solve.params[4] = -338807000000;
+    solve.params[5] = -3.20789;
+    solve.params[6] = -617.487;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
