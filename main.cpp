@@ -74,14 +74,14 @@ static ftyp compute(
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
     cftyp step_start = 1;
-    cftyp step_end   = 0.001;
-    cltyp part       = 0xFFFFFu;
-    cltyp loops      = part*50u;
-    ultyp full_rand  = part*4u;
+    cftyp step_end   = 0.0001;
+    cltyp part       = ((1u<<20)-1);
+    cltyp loops      = part*100u;
+    ultyp full_rand  = part*1u;
     cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
     ftyp step        = step_start;
     ftyp last        = e;
-    cftyp minInc     = 0.0000001;
+    cftyp minInc     = 0.000001;
 
     for( ultyp loop=0 ; loop <= loops ; loop++ ) {
         if( loop > full_rand ) {
@@ -101,7 +101,7 @@ static ftyp compute(
                 std::cout << best.params[i] << " ";
             }
             std::cout << std::endl;
-            if( last - e < minInc ) {
+            if( loop > 0 && (last - e) / last < minInc ) {
                 break;
             }
             last = e;
@@ -123,13 +123,13 @@ int main(int argc, char *argv[]) {
     TRnd rnd( seed );
     ftyp e;
     Solve best,solve;
-    solve.params[0] = 11194700000;
-    solve.params[1] = -2.59412;
-    solve.params[2] = 6.26282;
-    solve.params[3] = 0.831672;
-    solve.params[4] = -338807000000;
-    solve.params[5] = -3.20789;
-    solve.params[6] = -617.487;
+    solve.params[0] = 6.23386e+10;
+    solve.params[1] = -2.9183;
+    solve.params[2] = -2.89797e+12;
+    solve.params[3] = -3.60555;
+    solve.params[4] = 5.4548;
+    solve.params[5] = 0.845576;
+    solve.params[6] = -490.961;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
