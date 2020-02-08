@@ -70,7 +70,7 @@ static ftyp compute(
     Solve &best
 ) {
     static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481};
-    ftyp bigPenal = 1E-20;
+    ftyp bigPenal = 1E-26;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
     cftyp step_start = 1;
@@ -80,6 +80,7 @@ static ftyp compute(
     ultyp full_rand  = part*4u;
     cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
     ftyp step        = step_start;
+    ftyp last = e;
 
     for( ultyp loop=0 ; loop <= loops ; loop++ ) {
         if( loop > full_rand ) {
@@ -99,6 +100,10 @@ static ftyp compute(
                 std::cout << best.params[i] << " ";
             }
             std::cout << std::endl;
+            if( last - e < 0.000001 ) {
+                break;
+            }
+            last = e;
         }
     }
     return e;
