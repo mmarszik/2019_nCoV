@@ -74,9 +74,9 @@ static ftyp compute(
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
     cftyp step_start = 1.0;
-    cftyp step_end   = 0.001;
+    cftyp step_end   = 0.000001;
     cltyp part       = 0xFFFFFu;
-    cltyp loops      = part*20u;
+    cltyp loops      = part*50u;
     ultyp full_rand  = part*2u;
     cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
     ftyp step        = step_start;
