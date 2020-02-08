@@ -77,7 +77,7 @@ static ftyp compute(
     cftyp step_end   = 0.005;
     cltyp part       = 0xFFFFFu;
     cltyp loops      = part*50u;
-    ultyp full_rand  = part*2u;
+    ultyp full_rand  = part*4u;
     cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
     ftyp step        = step_start;
 
