@@ -69,19 +69,19 @@ static ftyp compute(
     TRnd &rnd,
     Solve &best
 ) {
-    static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481,34886,38000};
-    ftyp bigPenal = 1E-28;
+    static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481,34886,37198};
+    ftyp bigPenal = 1E-24;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
     cftyp step_start = 0.01;
-    cftyp step_end   = 0.000001;
-    cltyp part       = ((1u<<20)-1);
-    cltyp loops      = part*200u;
-    ultyp full_rand  = part*8u;
+    cftyp step_end   = 0.00001;
+    cltyp part       = ((1u<<23)-1);
+    cltyp loops      = part*25u;
+    ultyp full_rand  = part*1u;
     cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
     ftyp step        = step_start;
     ftyp last        = e;
-    cftyp minInc     = 0.00000;
+    cftyp minInc     = 0.000001;
 
     for( ultyp loop=0 ; loop <= loops ; loop++ ) {
         if( loop > full_rand ) {
@@ -123,13 +123,13 @@ int main(int argc, char *argv[]) {
     TRnd rnd( seed );
     ftyp e;
     Solve best,solve;
-    solve.params[0] = 5.20408;
-    solve.params[1] = 0.850416;
-    solve.params[2] = 219717000000;
-    solve.params[3] = -3.08152;
-    solve.params[4] = -3220330000000;
-    solve.params[5] = -3.56158;
-    solve.params[6] = -457.157;
+    solve.params[0] = 5.20842;
+    solve.params[1] = 0.850336;
+    solve.params[2] = 1.92796e+11;
+    solve.params[3] = -3.06653;
+    solve.params[4] = -3.21124e+12;
+    solve.params[5] = -3.56948;
+    solve.params[6] = -458.09;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
