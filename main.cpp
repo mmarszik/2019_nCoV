@@ -74,14 +74,14 @@ static ftyp compute(
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
     cftyp step_start = 1;
-    cftyp step_end   = 0.0001;
+    cftyp step_end   = 0.000001;
     cltyp part       = ((1u<<20)-1);
-    cltyp loops      = part*100u;
-    ultyp full_rand  = part*1u;
+    cltyp loops      = part*200u;
+    ultyp full_rand  = part*8u;
     cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
     ftyp step        = step_start;
     ftyp last        = e;
-    cftyp minInc     = 0.000001;
+    cftyp minInc     = 0.00000;
 
     for( ultyp loop=0 ; loop <= loops ; loop++ ) {
         if( loop > full_rand ) {
