@@ -13,7 +13,7 @@ using ultyp = unsigned long long;
 using cltyp = const ultyp;
 
 constexpr utyp SIZE_PRMS =  7;
-constexpr utyp SIZE_DATA = 20;
+constexpr utyp SIZE_DATA = 21;
 
 struct Solve {
     ftyp params[SIZE_PRMS];
@@ -49,15 +49,15 @@ void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
 }
 
 static void chaos( TRnd &rnd, ftyp params[SIZE_PRMS], cftyp step ) {
-    if( step >= 1 ) {
+    if( step >= 0.1 ) {
         switch( rnd() % 7 ) {
-            case 0: params[0] = rnd.getFloat(-1000,+1000); break;
+            case 0: params[0] = rnd.getFloat(-10000000,+10000000); break;
             case 1: params[1] = rnd.getFloat(-10,+10); break;
-            case 2: params[2] = rnd.getFloat(-1000,+1000); break;
+            case 2: params[2] = rnd.getFloat(-10000000,+10000000); break;
             case 3: params[3] = rnd.getFloat(-10,+10); break;
-            case 4: params[4] = rnd.getFloat(-1000,+1000); break;
+            case 4: params[4] = rnd.getFloat(-10000000,+10000000); break;
             case 5: params[5] = rnd.getFloat(-10,+10); break;
-            case 6: params[6] = rnd.getFloat(-30000,+30000); break;
+            case 6: params[6] = rnd.getFloat(-30000000,+30000000); break;
         }
     } else {
         utyp r = rnd() % SIZE_PRMS;
@@ -69,19 +69,19 @@ static ftyp compute(
     TRnd &rnd,
     Solve &best
 ) {
-    static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481,34886,37198};
+    static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481,34886,37198,40490};
     ftyp bigPenal = 1E-28;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
-    cftyp step_start = 1;
-    cftyp step_end   = 0.001;
+    cftyp step_start = 0.1;
+    cftyp step_end   = 0.0001;
     cltyp part       = ((1u<<20)-1);
     cltyp loops      = part*200u;
     ultyp full_rand  = part*8u;
     cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
     ftyp step        = step_start;
     ftyp last        = e;
-    cftyp minInc     = 0.00000;
+    cftyp minInc     = 0.0;
 
     for( ultyp loop=0 ; loop <= loops ; loop++ ) {
         if( loop > full_rand ) {
@@ -92,7 +92,7 @@ static ftyp compute(
         if( tmp <= e ) {
             best = solve;
             e = tmp;
-        } else if( rnd() % 3 == 0 ) {
+        } else if( rnd() % 5 == 0 ) {
             solve = best;
         }
         if( ! (loop & part) || loop == loops ) {
@@ -123,13 +123,14 @@ int main(int argc, char *argv[]) {
     TRnd rnd( seed );
     ftyp e;
     Solve best,solve;
-    solve.params[0] = 5.20842;
-    solve.params[1] = 0.850336;
-    solve.params[2] = 1.92796e+11;
-    solve.params[3] = -3.06653;
-    solve.params[4] = -3.21124e+12;
-    solve.params[5] = -3.56948;
-    solve.params[6] = -458.09;
+
+    solve.params[0] = 5.18605;
+    solve.params[1] = 0.850745;
+    solve.params[2] = 3.9417e+11;
+    solve.params[3] = -3.14257;
+    solve.params[4] = -3.23181e+12;
+    solve.params[5] = -3.51872;
+    solve.params[6] = -453.452 ;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
