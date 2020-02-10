@@ -49,7 +49,7 @@ void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
 }
 
 static void chaos( TRnd &rnd, ftyp params[SIZE_PRMS], cftyp step ) {
-    if( step >= 0.1 ) {
+    if( step >= 1 ) {
         switch( rnd() % 7 ) {
             case 0: params[0] = rnd.getFloat(-1000,+1000); break;
             case 1: params[1] = rnd.getFloat(-10,+10); break;
@@ -73,15 +73,15 @@ static ftyp compute(
     ftyp bigPenal = 1E-28;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
-    cftyp step_start = 0.1;
-    cftyp step_end   = 0.00001;
-    cltyp part       = ((1u<<23)-1);
-    cltyp loops      = part*25u;
-    ultyp full_rand  = part*1u;
+    cftyp step_start = 1;
+    cftyp step_end   = 0.001;
+    cltyp part       = ((1u<<20)-1);
+    cltyp loops      = part*200u;
+    ultyp full_rand  = part*8u;
     cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
     ftyp step        = step_start;
     ftyp last        = e;
-    cftyp minInc     = 0.000001;
+    cftyp minInc     = 0.00000;
 
     for( ultyp loop=0 ; loop <= loops ; loop++ ) {
         if( loop > full_rand ) {
