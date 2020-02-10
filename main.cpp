@@ -51,13 +51,13 @@ void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
 static void chaos( TRnd &rnd, ftyp params[SIZE_PRMS], cftyp step ) {
     if( step >= 1 ) {
         switch( rnd() % 7 ) {
-            case 0: params[0] = rnd.getFloat(-10000000,+10000000); break;
+            case 0: params[0] = rnd.getFloat(-1000,+1000); break;
             case 1: params[1] = rnd.getFloat(-10,+10); break;
-            case 2: params[2] = rnd.getFloat(-10000000,+10000000); break;
+            case 2: params[2] = rnd.getFloat(-1000,+1000); break;
             case 3: params[3] = rnd.getFloat(-10,+10); break;
-            case 4: params[4] = rnd.getFloat(-10000000,+10000000); break;
+            case 4: params[4] = rnd.getFloat(-1000,+1000); break;
             case 5: params[5] = rnd.getFloat(-10,+10); break;
-            case 6: params[6] = rnd.getFloat(-30000000,+30000000); break;
+            case 6: params[6] = rnd.getFloat(-3000,+3000); break;
         }
     } else {
         utyp r = rnd() % SIZE_PRMS;
@@ -70,7 +70,7 @@ static ftyp compute(
     Solve &best
 ) {
     static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481,34886,37198,40490};
-    ftyp bigPenal = 1E-28;
+    ftyp bigPenal = 1E-12;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
     cftyp step_start = 1;
@@ -124,13 +124,13 @@ int main(int argc, char *argv[]) {
     ftyp e;
     Solve best,solve;
 
-    solve.params[0] = 5.18249;
-    solve.params[1] = 0.850812;
-    solve.params[2] = 434974000000;
-    solve.params[3] = -3.1526;
-    solve.params[4] = -3268620000000;
-    solve.params[5] = -3.51314;
-    solve.params[6] = -452.782 ;
+//    solve.params[0] = 5.18249;
+//    solve.params[1] = 0.850812;
+//    solve.params[2] = 434974000000;
+//    solve.params[3] = -3.1526;
+//    solve.params[4] = -3268620000000;
+//    solve.params[5] = -3.51314;
+//    solve.params[6] = -452.782 ;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
