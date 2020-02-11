@@ -13,7 +13,7 @@ using ultyp = unsigned long long;
 using cltyp = const ultyp;
 
 constexpr utyp SIZE_PRMS =  7;
-constexpr utyp SIZE_DATA = 21;
+constexpr utyp SIZE_DATA = 22;
 
 struct Solve {
     ftyp params[SIZE_PRMS];
@@ -69,12 +69,12 @@ static ftyp compute(
     TRnd &rnd,
     Solve &best
 ) {
-    static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481,34886,37198,40490};
-    ftyp bigPenal = 1E-13;
+    static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481,34886,37198,40490,43100};
+    ftyp bigPenal = 1E-14;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
     cftyp step_start = 1;
-    cftyp step_end   = 0.000000001;
+    cftyp step_end   = 0.0001;
     cltyp part       = ((1u<<20)-1);
     cltyp loops      = part*200u;
     ultyp full_rand  = part*8u;
@@ -124,13 +124,13 @@ int main(int argc, char *argv[]) {
     ftyp e;
     Solve best,solve;
 
-    solve.params[0] = -31704.5;
-    solve.params[1] = -0.501624;
-    solve.params[2] = -1892.32;
-    solve.params[3] = 0.181099;
-    solve.params[4] = 10.9567;
-    solve.params[5] = 0.793537;
-    solve.params[6] = 6512.48;
+    solve.params[0] = -114220;
+    solve.params[1] = -0.673364;
+    solve.params[2] = 23697.2;
+    solve.params[3] = -0.184883;
+    solve.params[4] = 8.31142;
+    solve.params[5] = 0.812269;
+    solve.params[6] = -6258.38;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
