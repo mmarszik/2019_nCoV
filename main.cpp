@@ -13,7 +13,7 @@ using ultyp = unsigned long long;
 using cltyp = const ultyp;
 
 constexpr utyp SIZE_PRMS =  7;
-constexpr utyp SIZE_DATA = 22;
+constexpr utyp SIZE_DATA = 23;
 
 struct Solve {
     ftyp params[SIZE_PRMS];
@@ -69,7 +69,7 @@ static ftyp compute(
     TRnd &rnd,
     Solve &best
 ) {
-    static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481,34886,37198,40490,43100};
+    static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481,34886,37198,40490,43107,45174};
     ftyp bigPenal = 1E-12;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
