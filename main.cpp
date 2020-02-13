@@ -124,13 +124,13 @@ int main(int argc, char *argv[]) {
     ftyp e;
     Solve best,solve;
 
-    solve.params[0] = -114220;
-    solve.params[1] = -0.673364;
-    solve.params[2] = 23697.2;
-    solve.params[3] = -0.184883;
-    solve.params[4] = 8.31142;
-    solve.params[5] = 0.812269;
-    solve.params[6] = -6258.38;
+    solve.params[0] = -39329.8;
+    solve.params[1] = -0.52263;
+    solve.params[2] = 17347.3;
+    solve.params[3] = -0.0878067;
+    solve.params[4] = 5.8613;
+    solve.params[5] = 0.843971;
+    solve.params[6] = -8844.76;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
