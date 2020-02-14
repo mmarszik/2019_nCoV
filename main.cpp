@@ -26,13 +26,13 @@ ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
 
 ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
     ftyp e = 0;
-    for( utyp i=1 ; i<SIZE_DATA ; i++ ) {
-        cftyp p1 = data[i] - data[i-1];
-        cftyp p2 = data[i] - formula( data[i-1] , params );
-        cftyp tmp = p1 - p2;
+    for( utyp i=2 ; i<SIZE_DATA ; i++ ) {
+        cftyp p1 = data[i-1] - data[i-2];
+        cftyp p2 = data[i-0] - data[i-1];
+        cftyp tmp = p2 - formula( p1 , params );
         e += tmp * tmp;
     }
-    e = sqrt( e / (SIZE_DATA-1) );
+    e = sqrt( e / (SIZE_DATA-2) );
     for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
         e += params[i] * params[i] * bigPenal;
     }
@@ -55,7 +55,7 @@ void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
 }
 
 static void chaos( TRnd &rnd, ftyp params[SIZE_PRMS], cftyp step ) {
-    if( step >= 0.01 ) {
+    if( step >= 0.1 ) {
         switch( rnd() % 7 ) {
             case 0: params[0] = rnd.getFloat(-300000,+300000); break;
             case 1: params[1] = rnd.getFloat(-2,+2); break;
@@ -79,8 +79,8 @@ static ftyp compute(
     ftyp bigPenal = 1E-11;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
-    cftyp step_start = 0.01;
-    cftyp step_end   = 0.001;
+    cftyp step_start = 0.1;
+    cftyp step_end   = 0.0001;
     cltyp part       = ((1u<<20)-1);
     cltyp loops      = part*200u;
     ultyp full_rand  = part*8u;
