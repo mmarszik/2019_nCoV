@@ -55,7 +55,7 @@ void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
 }
 
 static void chaos( TRnd &rnd, ftyp params[SIZE_PRMS], cftyp step ) {
-    if( step >= 0.1 ) {
+    if( step >= 0.01 ) {
         switch( rnd() % 7 ) {
             case 0: params[0] = rnd.getFloat(-300000,+300000); break;
             case 1: params[1] = rnd.getFloat(-2,+2); break;
