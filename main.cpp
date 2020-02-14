@@ -26,15 +26,11 @@ ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
 
 ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
     ftyp e = 0;
-    ftyp a = 0;
     for( utyp i=1 ; i<SIZE_DATA ; i++ ) {
-        ftyp tmp = data[i-0] - formula( data[i-1] , params );
-        tmp /= data[i-0];
+        cftyp tmp = data[i-0] - formula( data[i-1] , params );
         e += tmp * tmp;
-        a += data[i-0];
     }
-    a /= SIZE_DATA-1;
-    e *= a;
+    e = sqrt( e / (SIZE_DATA-1) );
     for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
         e += params[i] * params[i] * bigPenal;
     }
