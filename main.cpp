@@ -3,8 +3,6 @@
 #include <sstream>
 #include <cstring>
 #include <iomanip>
-#include <avx2intrin.h>
-
 #include <MRndCPP/rnd.h>
 
 //using TRnd = std::ranlux48;
