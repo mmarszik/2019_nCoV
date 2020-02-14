@@ -20,7 +20,6 @@ struct Solve {
 };
 
 
-
 ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
     return params[0] * pow(x , params[1] ) + params[2] * pow(x , params[3] ) + params[4] * pow(x , params[5] ) + params[6];
 }
@@ -28,15 +27,17 @@ ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
 ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
     ftyp e = 0;
     for( utyp i=1 ; i<SIZE_DATA ; i++ ) {
-        cftyp tmp = fabs( data[i] - formula( data[i-1] , params ) ) / data[i];
+        cftyp p1 = data[i] - data[i-1];
+        cftyp p2 = data[i] - formula( data[i-1] , params );
+        cftyp tmp = p1 - p2;
         e += tmp * tmp;
     }
+    e = sqrt( e / (SIZE_DATA-1) );
     for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
         e += params[i] * params[i] * bigPenal;
     }
     return e;
 }
-
 
 
 
@@ -75,14 +76,14 @@ static ftyp compute(
     Solve &best
 ) {
     static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481,34886,37198,40490,43107,45174,47054,49070};
-    ftyp bigPenal = 1E-14;
+    ftyp bigPenal = 1E-11;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
-    cftyp step_start = 0.1;
-    cftyp step_end   = 0.0001;
+    cftyp step_start = 0.01;
+    cftyp step_end   = 0.001;
     cltyp part       = ((1u<<20)-1);
-    cltyp loops      = part*50u;
-    ultyp full_rand  = part*3u;
+    cltyp loops      = part*200u;
+    ultyp full_rand  = part*8u;
     cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
     ftyp step        = step_start;
     ftyp last        = e;

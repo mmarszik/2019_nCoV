@@ -6,7 +6,6 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG += C++14
 QMAKE_CXXFLAGS += -O3
-QMAKE_CXXFLAGS += -mavx512f
 
 INCLUDEPATH += vendor/
 
