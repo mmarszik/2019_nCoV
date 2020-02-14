@@ -26,13 +26,15 @@ ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
 
 ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
     ftyp e = 0;
-    for( utyp i=2 ; i<SIZE_DATA ; i++ ) {
-        cftyp p1 = data[i-1] - data[i-2];
-        cftyp p2 = data[i-0] - data[i-1];
-        cftyp tmp = p2 - formula( p1 , params );
+    ftyp a = 0;
+    for( utyp i=1 ; i<SIZE_DATA ; i++ ) {
+        ftyp tmp = data[i-0] - formula( data[i-1] , params );
+        tmp /= data[i-0];
         e += tmp * tmp;
+        a += data[i-0];
     }
-    e = sqrt( e / (SIZE_DATA-2) );
+    a /= SIZE_DATA-1;
+    e *= a;
     for( utyp i=0 ; i<SIZE_PRMS ; i++ ) {
         e += params[i] * params[i] * bigPenal;
     }
@@ -76,7 +78,7 @@ static ftyp compute(
     Solve &best
 ) {
     static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481,34886,37198,40490,43107,45174,47054,49070};
-    ftyp bigPenal = 1E-11;
+    ftyp bigPenal = 1E-9;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
     cftyp step_start = 0.1;
