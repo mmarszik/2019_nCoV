@@ -12,8 +12,8 @@ using utyp = unsigned int;
 using ultyp = unsigned long long;
 using cltyp = const ultyp;
 
-constexpr utyp SIZE_PRMS =  9;
-constexpr utyp SIZE_DATA = 28;
+constexpr utyp SIZE_PRMS = 11;
+constexpr utyp SIZE_DATA = 29;
 
 struct Solve {
     ftyp params[SIZE_PRMS];
@@ -25,8 +25,9 @@ ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
         params[0] * pow(x , params[1] ) +
         params[2] * pow(x , params[3] ) +
         params[4] * pow(x , params[5] ) +
-        params[6] +
-        ( x > params[7] ? params[8] : 0 )
+        params[6] * pow(x , params[7] ) +
+        params[8] +
+        ( x > params[9] ? params[10] : 0 )
     ;
 }
 
@@ -58,22 +59,26 @@ void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
     params[4] = d1(rnd);
     params[5] = d2(rnd);
     params[6] = d3(rnd);
-    params[7] = d4(rnd);
-    params[8] = d5(rnd);
+    params[7] = d2(rnd);
+    params[8] = d3(rnd);
+    params[9] = d4(rnd);
+    params[10] = d5(rnd);
 }
 
 static void chaos( TRnd &rnd, ftyp params[SIZE_PRMS], cftyp step ) {
-    if( step >= 0.1 ) {
+    if( step >= 0.05 ) {
         switch( rnd() % SIZE_PRMS ) {
-            case 0: params[0] = rnd.getFloat(-300000,+300000); break;
+            case 0: params[0] = rnd.getFloat(-1000000,+1000000); break;
             case 1: params[1] = rnd.getFloat(-2,+2); break;
-            case 2: params[2] = rnd.getFloat(-300000,+300000); break;
+            case 2: params[2] = rnd.getFloat(-1000000,+1000000); break;
             case 3: params[3] = rnd.getFloat(-2,+2); break;
-            case 4: params[4] = rnd.getFloat(-300000,+300000); break;
+            case 4: params[4] = rnd.getFloat(-1000000,+1000000); break;
             case 5: params[5] = rnd.getFloat(-2,+2); break;
-            case 6: params[6] = rnd.getFloat(-20000,+20000); break;
-            case 7: params[7] = rnd.getFloat(0,+1000000); break;
+            case 6: params[6] = rnd.getFloat(-1000000,+1000000); break;
+            case 7: params[7] = rnd.getFloat(-2,+2); break;
             case 8: params[8] = rnd.getFloat(-1000000,+1000000); break;
+            case 9: params[9] = rnd.getFloat(0,+1000000); break;
+            case 10: params[10] = rnd.getFloat(-1000000,+1000000); break;
         }
     } else {
         utyp r = rnd() % SIZE_PRMS;
@@ -85,15 +90,15 @@ static ftyp compute(
     TRnd &rnd,
     Solve &best
 ) {
-    static cftyp data[SIZE_DATA] = {282,314,581,846,1300,2000,2800,4600,6100,7800,9800,12000,14600,17400,20600,24600,28300,31500,34900,37600,40600,43100,45200,60400,64500,67200,69300,71400};
+    static cftyp data[SIZE_DATA] = {282,314,581,846,1300,2000,2800,4600,6100,7800,9800,12000,14600,17400,20600,24600,28300,31500,34900,37600,40600,43100,45200,60400,64500,67200,69300,71400,73300};
     ftyp bigPenal = 1E-12;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
-    cftyp step_start = 0.1;
-    cftyp step_end   = 0.0001;
+    cftyp step_start = 0.05;
+    cftyp step_end   = 0.001;
     cltyp part       = ((1u<<20)-1);
     cltyp loops      = part*200u;
-    ultyp full_rand  = part*8u;
+    ultyp full_rand  = part*2u;
     cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
     ftyp step        = step_start;
     ftyp last        = e;
@@ -143,15 +148,17 @@ int main(int argc, char *argv[]) {
     ftyp e;
     Solve best,solve;
 
-    solve.params[0] = -115062.09040479;
-    solve.params[1] = -0.66932349240257;
-    solve.params[2] =  24487.110701744;
-    solve.params[3] = -0.17814849773133;
-    solve.params[4] = 8.8181306303682;
-    solve.params[5] = 0.80692111206142;
-    solve.params[6] = -6816.6219105287;
-    solve.params[7] = 45000;
-    solve.params[8] = 15000;
+    solve.params[0] = 3892.61;
+    solve.params[1] = 0.326133;
+    solve.params[2] = 725786;
+    solve.params[3] = -0.24171;
+    solve.params[4] = -1.56447e+06;
+    solve.params[5] = -0.531985;
+    solve.params[6] = -132265;
+    solve.params[7] = 0;
+    solve.params[8] = 1.94952e-100;
+    solve.params[9] = 43100;
+    solve.params[10] = 11284.3;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
@@ -167,7 +174,11 @@ int main(int argc, char *argv[]) {
         }
         std::cout << std::endl;
         std::cout << "----------------------------------" << std::endl;
-        initParams( rnd , solve.params );
+        if( time(NULL) - start < 2*3600 || !(loop & 3) ) {
+            solve = best;
+        } else {
+            initParams( rnd , solve.params );
+        }
     }
     return 0;
 }
