@@ -13,14 +13,14 @@ using ultyp = unsigned long long;
 using cltyp = const ultyp;
 
 constexpr utyp SIZE_PRMS = 11;
-constexpr utyp SIZE_DATA = 29;
+constexpr utyp SIZE_DATA = 30;
 
 struct Solve {
     ftyp params[SIZE_PRMS];
 };
 
 
-ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
+static ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
     return
         params[0] * pow(x , params[1] ) +
         params[2] * pow(x , params[3] ) +
@@ -31,7 +31,7 @@ ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
     ;
 }
 
-ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
+static ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
     ftyp e = 0;
     for( utyp i=1 ; i<SIZE_DATA ; i++ ) {
         cftyp tmp = data[i-0] - formula( data[i-1] , params );
@@ -90,7 +90,7 @@ static ftyp compute(
     TRnd &rnd,
     Solve &best
 ) {
-    static cftyp data[SIZE_DATA] = {282,314,581,846,1300,2000,2800,4600,6100,7800,9800,12000,14600,17400,20600,24600,28300,31500,34900,37600,40600,43100,45200,60400,64500,67200,69300,71400,73300};
+    static cftyp data[SIZE_DATA] = {282,314,581,846,1300,2000,2800,4600,6100,7800,9800,12000,14600,17400,20600,24600,28300,31500,34900,37600,40600,43100,45200,60400,64500,67200,69300,71400,73400,75300};
     ftyp bigPenal = 1E-12;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
@@ -148,17 +148,17 @@ int main(int argc, char *argv[]) {
     ftyp e;
     Solve best,solve;
 
-    solve.params[0] = 3892.61;
-    solve.params[1] = 0.326133;
-    solve.params[2] = 725786;
-    solve.params[3] = -0.24171;
-    solve.params[4] = -1.56447e+06;
-    solve.params[5] = -0.531985;
-    solve.params[6] = -132265;
-    solve.params[7] = 0;
-    solve.params[8] = 1.94952e-100;
-    solve.params[9] = 43100;
-    solve.params[10] = 11284.3;
+    solve.params[0] = -1991801.2353211;
+    solve.params[1] = -0.37576946755367;
+    solve.params[2] = 22416.646814259;
+    solve.params[3] = 0.22200211569993;
+    solve.params[4] = 794975.80614753;
+    solve.params[5] = -0.20624828537027;
+    solve.params[6] = 793917.58526495;
+    solve.params[7] = -0.20659790073971;
+    solve.params[8] = -335207.67144284;
+    solve.params[9] = 43100.059001964;
+    solve.params[10] = 11459.611097623;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
