@@ -149,19 +149,19 @@ int main(int argc, char *argv[]) {
     std::cout << "mainSeed: " << seed << std::endl;
     TRnd rnd( seed );
     ftyp e;
-    Solve best,solve;
+    Solve best, solve;
 
-    solve.params[0] = 116025;
-    solve.params[1] = -0.061314;
-    solve.params[2] = 1775.33;
-    solve.params[3] = 0.395216;
-    solve.params[4] = 113962;
-    solve.params[5] = -0.0612617;
-    solve.params[6] = 2800.04;
-    solve.params[7] = -6035.21;
-    solve.params[8] = 9800.14;
-    solve.params[9] = -7421.37;
-    solve.params[10] = -177409;
+    solve.params[0] = 10777.2;
+    solve.params[1] = -0.048357;
+    solve.params[2] = 13.5701;
+    solve.params[3] = 0.778152;
+    solve.params[4] = 10751.2;
+    solve.params[5] = -0.0481005;
+    solve.params[6] = 2800.13;
+    solve.params[7] = -1569.95;
+    solve.params[8] = 9800.01;
+    solve.params[9] = -1532.1;
+    solve.params[10] = -16919.3;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
