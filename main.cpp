@@ -6,9 +6,9 @@
 #include <MRndCPP/rnd.h>
 
 //using TRnd = std::ranlux48;
-using ftyp = double;
+using ftyp  = double;
 using cftyp = const ftyp;
-using utyp = unsigned int;
+using utyp  = unsigned int;
 using ultyp = unsigned long long;
 using cltyp = const ultyp;
 
@@ -19,16 +19,15 @@ struct Solve {
     ftyp params[SIZE_PRMS];
 };
 
-
 static ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
     return
         params[0] * pow(x , params[1] ) +
         params[2] * pow(x , params[3] ) +
         params[4] * pow(x , params[5] ) +
-        params[6] * pow(x , params[7] ) +
-        params[8] +
-        ( x > params[9] ? params[10] : 0 )
-    ;
+        ( x > params[6] ? params[7] : 0 ) +
+        ( x > params[8] ? params[9] : 0 ) +
+        params[10]
+        ;
 }
 
 static ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
@@ -44,41 +43,45 @@ static ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal
     return e;
 }
 
-
-
 void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
-    std::uniform_real_distribution<ftyp> d1(-300000,+300000);
+    std::uniform_real_distribution<ftyp> d1(-100000,+100000);
     std::uniform_real_distribution<ftyp> d2(-2,+2);
-    std::uniform_real_distribution<ftyp> d3(-20000,+20000);
-    std::uniform_real_distribution<ftyp> d4(0,+1000000);
-    std::uniform_real_distribution<ftyp> d5(-1000000,+1000000);
+    std::uniform_real_distribution<ftyp> d3(-100000,+100000);
+    std::uniform_real_distribution<ftyp> d4(0,+100000);
+    std::uniform_real_distribution<ftyp> d5(-100000,+100000);
+
     params[0] = d1(rnd);
     params[1] = d2(rnd);
+
     params[2] = d1(rnd);
     params[3] = d2(rnd);
+
     params[4] = d1(rnd);
     params[5] = d2(rnd);
-    params[6] = d3(rnd);
-    params[7] = d2(rnd);
-    params[8] = d3(rnd);
-    params[9] = d4(rnd);
-    params[10] = d5(rnd);
+
+    params[6] = d4(rnd);
+    params[7] = d5(rnd);
+
+    params[8] = d4(rnd);
+    params[9] = d5(rnd);
+
+    params[10] = d3(rnd);
 }
 
 static void chaos( TRnd &rnd, ftyp params[SIZE_PRMS], cftyp step ) {
-    if( step >= 0.05 ) {
+    if( step >= 0.5 ) {
         switch( rnd() % SIZE_PRMS ) {
-            case 0: params[0] = rnd.getFloat(-1000000,+1000000); break;
-            case 1: params[1] = rnd.getFloat(-2,+2); break;
-            case 2: params[2] = rnd.getFloat(-1000000,+1000000); break;
-            case 3: params[3] = rnd.getFloat(-2,+2); break;
-            case 4: params[4] = rnd.getFloat(-1000000,+1000000); break;
-            case 5: params[5] = rnd.getFloat(-2,+2); break;
-            case 6: params[6] = rnd.getFloat(-1000000,+1000000); break;
-            case 7: params[7] = rnd.getFloat(-2,+2); break;
-            case 8: params[8] = rnd.getFloat(-1000000,+1000000); break;
-            case 9: params[9] = rnd.getFloat(0,+1000000); break;
-            case 10: params[10] = rnd.getFloat(-1000000,+1000000); break;
+            case  0: params[ 0] = rnd.getFloat(-100000,+100000); break;
+            case  1: params[ 1] = rnd.getFloat(-2,+2); break;
+            case  2: params[ 2] = rnd.getFloat(-100000,+100000); break;
+            case  3: params[ 3] = rnd.getFloat(-2,+2); break;
+            case  4: params[ 4] = rnd.getFloat(-100000,+100000); break;
+            case  5: params[ 5] = rnd.getFloat(-2,+2); break;
+            case  6: params[ 6] = rnd.getFloat(0,+100000); break;
+            case  7: params[ 7] = rnd.getFloat(-100000,+100000); break;
+            case  8: params[ 8] = rnd.getFloat(0,+100000); break;
+            case  9: params[ 9] = rnd.getFloat(-100000,+100000); break;
+            case 10: params[10] = rnd.getFloat(-100000,+100000); break;
         }
     } else {
         utyp r = rnd() % SIZE_PRMS;
@@ -91,13 +94,13 @@ static ftyp compute(
     Solve &best
 ) {
     static cftyp data[SIZE_DATA] = {282,314,581,846,1300,2000,2800,4600,6100,7800,9800,12000,14600,17400,20600,24600,28300,31500,34900,37600,40600,43100,45200,60400,64500,67200,69300,71400,73400,75300};
-    ftyp bigPenal = 1E-12;
+    ftyp bigPenal = 1E-9;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
-    cftyp step_start = 0.05;
+    cftyp step_start = 0.5;
     cftyp step_end   = 0.001;
     cltyp part       = ((1u<<20)-1);
-    cltyp loops      = part*200u;
+    cltyp loops      = part*50u;
     ultyp full_rand  = part*2u;
     cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
     ftyp step        = step_start;
@@ -148,17 +151,17 @@ int main(int argc, char *argv[]) {
     ftyp e;
     Solve best,solve;
 
-    solve.params[0] = -1991801.2353211;
-    solve.params[1] = -0.37576946755367;
-    solve.params[2] = 22416.646814259;
-    solve.params[3] = 0.22200211569993;
-    solve.params[4] = 794975.80614753;
-    solve.params[5] = -0.20624828537027;
-    solve.params[6] = 793917.58526495;
-    solve.params[7] = -0.20659790073971;
-    solve.params[8] = -335207.67144284;
-    solve.params[9] = 43100.059001964;
-    solve.params[10] = 11459.611097623;
+    solve.params[0] = 116025;
+    solve.params[1] = -0.061314;
+    solve.params[2] = 1775.33;
+    solve.params[3] = 0.395216;
+    solve.params[4] = 113962;
+    solve.params[5] = -0.0612617;
+    solve.params[6] = 2800.04;
+    solve.params[7] = -6035.21;
+    solve.params[8] = 9800.14;
+    solve.params[9] = -7421.37;
+    solve.params[10] = -177409;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
