@@ -13,7 +13,7 @@ using ultyp = unsigned long long;
 using cltyp = const ultyp;
 
 constexpr utyp SIZE_PRMS = 11;
-constexpr utyp SIZE_DATA = 30;
+constexpr utyp SIZE_DATA = 31;
 
 struct Solve {
     ftyp params[SIZE_PRMS];
@@ -69,7 +69,7 @@ void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
 }
 
 static void chaos( TRnd &rnd, ftyp params[SIZE_PRMS], cftyp step ) {
-    if( step >= 0.5 ) {
+    if( step >= 0.1 ) {
         switch( rnd() % SIZE_PRMS ) {
             case  0: params[ 0] = rnd.getFloat(-100000,+100000); break;
             case  1: params[ 1] = rnd.getFloat(-2,+2); break;
@@ -93,15 +93,15 @@ static ftyp compute(
     TRnd &rnd,
     Solve &best
 ) {
-    static cftyp data[SIZE_DATA] = {282,314,581,846,1300,2000,2800,4600,6100,7800,9800,12000,14600,17400,20600,24600,28300,31500,34900,37600,40600,43100,45200,60400,64500,67200,69300,71400,73400,75300};
-    ftyp bigPenal = 1E-9;
+    static cftyp data[SIZE_DATA] = {282,314,581,846,1300,2000,2800,4600,6100,7800,9800,12000,14600,17400,20600,24600,28300,31500,34900,37600,40600,43100,45200,60400,64500,67200,69300,71400,73400,75300,75800};
+    ftyp bigPenal = 1E-8;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
-    cftyp step_start = 0.5;
-    cftyp step_end   = 0.001;
+    cftyp step_start = 0.1;
+    cftyp step_end   = 0.0001;
     cltyp part       = ((1u<<20)-1);
-    cltyp loops      = part*50u;
-    ultyp full_rand  = part*2u;
+    cltyp loops      = part*200u;
+    ultyp full_rand  = part*8u;
     cftyp ratio      = pow(step_end/step_start,1.0/(loops-full_rand) );
     ftyp step        = step_start;
     ftyp last        = e;
@@ -151,17 +151,17 @@ int main(int argc, char *argv[]) {
     ftyp e;
     Solve best, solve;
 
-    solve.params[0] = 10777.2;
-    solve.params[1] = -0.048357;
-    solve.params[2] = 13.5701;
-    solve.params[3] = 0.778152;
-    solve.params[4] = 10751.2;
-    solve.params[5] = -0.0481005;
-    solve.params[6] = 2800.13;
-    solve.params[7] = -1569.95;
-    solve.params[8] = 9800.01;
-    solve.params[9] = -1532.1;
-    solve.params[10] = -16919.3;
+    solve.params[0] = 35792.965392093;
+    solve.params[1] = -0.07956439824571;
+    solve.params[2] = 9.2610675544257;
+    solve.params[3] = 0.80469806515388;
+    solve.params[4] = -47309.549911572;
+    solve.params[5] = -0.42667616937598;
+    solve.params[6] = 45200.000039683;
+    solve.params[7] = -9611.938658053;
+    solve.params[8] = 43100.000006846;
+    solve.params[9] = 13073.546866785;
+    solve.params[10] = -19039.747067481;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
