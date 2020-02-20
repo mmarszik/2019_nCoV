@@ -179,9 +179,9 @@ int main(int argc, char *argv[]) {
         std::cout << "----------------------------------" << std::endl;
         if( time(NULL) - start < 2*3600 || !(loop & 3) ) {
             solve = best;
+            chaos( rnd , solve.params , 0.05 );
         } else {
             initParams( rnd , solve.params );
-            chaos( rnd , solve.params , 0.05 );
         }
     }
     return 0;
