@@ -69,7 +69,7 @@ void initParams( TRnd &rnd, ftyp params[SIZE_PRMS] ) {
 }
 
 static void chaos( TRnd &rnd, ftyp params[SIZE_PRMS], cftyp step ) {
-    if( step >= 0.1 ) {
+    if( step == 0.4 ) {
         switch( rnd() % SIZE_PRMS ) {
             case  0: params[ 0] = rnd.getFloat(-100000,+100000); break;
             case  1: params[ 1] = rnd.getFloat(-2,+2); break;
@@ -97,7 +97,7 @@ static ftyp compute(
     ftyp bigPenal = 1E-8;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
-    cftyp step_start = 0.1;
+    cftyp step_start = 0.4;
     cftyp step_end   = 0.001;
     cltyp part       = ((1u<<23)-1);
     cltyp loops      = part*50u;
@@ -151,17 +151,17 @@ int main(int argc, char *argv[]) {
     ftyp e;
     Solve best, solve;
 
-    solve.params[0] = 13057.8;
-    solve.params[1] = -0.0914576;
-    solve.params[2] = 7.65127;
+    solve.params[0] = 13056.96011302;
+    solve.params[1] = -0.091432531650926;
+    solve.params[2] = 7.65121686068;
     solve.params[3] = 0.819028;
-    solve.params[4] = -10175.8;
-    solve.params[5] = -0.463808;
+    solve.params[4] = -10174.058829715;
+    solve.params[5] = -0.46378894077156;
     solve.params[6] = 45200;
-    solve.params[7] = -9615.59;
+    solve.params[7] = -9615.5581955928;
     solve.params[8] = 43100;
-    solve.params[9] = 13158.2;
-    solve.params[10] = -7298.82;
+    solve.params[9] = 13158.586357377;
+    solve.params[10] = -7299.5084900608;
 
     time_t start = time(NULL);
     for( utyp loop=0 ; loop < loops ; loop++ ) {
@@ -179,7 +179,7 @@ int main(int argc, char *argv[]) {
         std::cout << "----------------------------------" << std::endl;
         if( time(NULL) - start < 2*3600 || !(loop & 3) ) {
             solve = best;
-            chaos( rnd , solve.params , 0.05 );
+            chaos( rnd , solve.params , 0.5 );
         } else {
             initParams( rnd , solve.params );
         }
