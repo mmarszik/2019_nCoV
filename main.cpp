@@ -13,7 +13,7 @@ using ultyp = unsigned long long;
 using cltyp = const ultyp;
 
 constexpr utyp SIZE_PRMS = 11;
-constexpr utyp SIZE_DATA = 34;
+constexpr utyp SIZE_DATA = 36;
 
 struct Solve {
     ftyp params[SIZE_PRMS];
@@ -27,7 +27,7 @@ static ftyp formula( cftyp x , cftyp params[SIZE_PRMS] ) {
         ( x > params[6] ? params[7] : 0 ) +
         ( x > params[8] ? params[9] : 0 ) +
         params[10]
-        ;
+    ;
 }
 
 static ftyp eval( cftyp params[SIZE_PRMS], cftyp data[SIZE_DATA], cftyp bigPenal ) {
@@ -93,7 +93,7 @@ static ftyp compute(
     TRnd &rnd,
     Solve &best
 ) {
-    static cftyp data[SIZE_DATA] = {282,314,581,846,1300,2000,2800,4600,6100,7800,9800,12000,14600,17400,20600,24600,28300,31500,34900,37600,40600,43100,45200,60400,64500,67200,69300,71400,73400,75300,75800,76800,77900,78800};
+    static cftyp data[SIZE_DATA] = {282,314,579,843,1337,2014,2798,4593,6065,7818,9826,11953,14557,17391,20630,24554,28276,31481,34886,37558,40554,43103,45171,46997,49053,50580,51512,71429,73322,75204,75748,76769,77794,78811,79331,80239};
     ftyp bigPenal = 1E-8;
     ftyp e = eval( best.params , data , bigPenal );
     Solve solve = best;
